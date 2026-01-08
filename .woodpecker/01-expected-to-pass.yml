@@ -79,3 +79,19 @@ steps:
           exit 0
         fi
     depends_on: []
+
+  - name: frontend-complexity-B
+    image: python:3.14-slim
+    commands:
+      - pip install radon
+      - |
+        COMPLEXITY_OUTPUT=$(radon cc src/frontend -a -n C)
+        echo "$COMPLEXITY_OUTPUT"
+        if echo "$COMPLEXITY_OUTPUT" | grep -Eq '[C-F]$'; then
+          echo "Complexity worse than B found!"
+          exit 1
+        else
+          echo "All functions have complexity B or lower"
+          exit 0
+        fi
+    depends_on: []
