@@ -1,0 +1,14 @@
+[project]
+name = "google-agent-frontend"
+version = "0.1.0"
+dependencies = [
+    "google-adk",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+managed = true
+package = false

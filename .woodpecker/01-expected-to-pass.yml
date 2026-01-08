@@ -1,0 +1,81 @@
+when:
+  - event: [push, pull_request]
+
+steps:
+  - name: cpd-frontend
+    image: pmdcode/pmd:latest
+    commands:
+      - pmd cpd --minimum-tokens 150 --dir ./src/frontend --language python --format text
+    depends_on: []
+
+  - name: code-style-frontend
+    image: alpine/flake8:latest
+    commands:
+      - flake8 --max-line-length=120 --exclude=venv,migrations --ignore=E203,W503 src/frontend
+    depends_on: []
+
+  - name: frontend-no-streamlit
+    image: alpine:latest
+    commands:
+      - grep -r -n "import streamlit" ./src/frontend && exit 1 || exit 0
+    depends_on: []
+
+  - name: cpd-all
+    image: pmdcode/pmd:latest
+    commands:
+      - pmd cpd --minimum-tokens 250 --dir . --language python --format text
+    depends_on: []
+
+  - name: code-style-all
+    image: alpine/flake8:latest
+    commands:
+      - flake8 --max-line-length=120 --exclude=venv,migrations --ignore=E203,W503 .
+    depends_on: []
+
+  - name: frontend-complexity-E
+    image: python:3.14-slim
+    commands:
+      - pip install radon
+      - |
+        COMPLEXITY_OUTPUT=$(radon cc src/frontend -a -n F)
+        echo "$COMPLEXITY_OUTPUT"
+        if echo "$COMPLEXITY_OUTPUT" | grep -Eq '[F]$'; then
+          echo "Complexity worse than E found!"
+          exit 1
+        else
+          echo "All functions have complexity E or lower"
+          exit 0
+        fi
+    depends_on: []
+
+  - name: frontend-complexity-D
+    image: python:3.14-slim
+    commands:
+      - pip install radon
+      - |
+        COMPLEXITY_OUTPUT=$(radon cc src/frontend -a -n E)
+        echo "$COMPLEXITY_OUTPUT"
+        if echo "$COMPLEXITY_OUTPUT" | grep -Eq '[E-F]$'; then
+          echo "Complexity worse than D found!"
+          exit 1
+        else
+          echo "All functions have complexity D or lower"
+          exit 0
+        fi
+    depends_on: []
+
+  - name: frontend-complexity-C
+    image: python:3.14-slim
+    commands:
+      - pip install radon
+      - |
+        COMPLEXITY_OUTPUT=$(radon cc src/frontend -a -n D)
+        echo "$COMPLEXITY_OUTPUT"
+        if echo "$COMPLEXITY_OUTPUT" | grep -Eq '[D-F]$'; then
+          echo "Complexity worse than C found!"
+          exit 1
+        else
+          echo "All functions have complexity C or lower"
+          exit 0
+        fi
+    depends_on: []
