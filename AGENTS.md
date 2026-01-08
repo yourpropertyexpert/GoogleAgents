@@ -13,7 +13,7 @@ This document specifies how agents (human and AI) should build and maintain this
 To pass the CI pipeline (`.woodpecker/01-expected-to-pass.yml`), all code must adhere to the following:
 
 - **Style**: 120 character line limit. Ignore E203, W503.
-- **Complexity**: All functions must have a cyclomatic complexity of **C (10)** or lower (as measured by `radon`).
+- **Complexity**: All functions must have a cyclomatic complexity of **B** or lower (as measured by `radon`).
 - **Duplicates**: Maintain low code duplication. PMD CPD token limit is 150 for frontend and 250 for the whole project.
 - **Dependencies**: No `streamlit` allowed in the core client/frontend logic.
 - **Documentation**: Google Style docstrings are required for all public interfaces.
