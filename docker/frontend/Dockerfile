@@ -10,8 +10,16 @@ WORKDIR /app
 # Copy configuration files
 COPY uv.toml pyproject.toml ./
 
-# Install google-adk
-RUN uv pip install --system google-adk
+# Install dependencies
+RUN uv pip install --system \
+    google-adk \
+    fastapi \
+    uvicorn \
+    mysql-connector-python \
+    jinja2 \
+    python-multipart \
+    requests \
+    beautifulsoup4
 
 # Verify installation during build
 RUN python -c "import google.adk; print('Google ADK imported successfully')"

@@ -25,8 +25,31 @@ services:
       - ./src:/app/src
     depends_on:
       - google_agents_mariadb
+      - google_agents_db_setup
+    ports:
+      - "8000:8000"
     networks:
       - agent_network
+
+  google_agents_db_setup:
+    image: mariadb:11.4
+    container_name: agent_db_setup
+    volumes:
+      - ./src/schema.sql:/schema.sql
+    depends_on:
+      - google_agents_mariadb
+    networks:
+      - agent_network
+    command: >
+      /bin/sh -c "
+      echo 'Waiting for MariaDB to be ready...';
+      while ! mariadb-admin ping -h google_agents_mariadb -uagent_user -pagent_password --silent; do
+        sleep 1;
+      done;
+      echo 'Importing schema...';
+      mariadb -h google_agents_mariadb -uagent_user -pagent_password agent_db < /schema.sql;
+      echo 'Schema imported successfully.';
+      "
 
 networks:
   agent_network:
